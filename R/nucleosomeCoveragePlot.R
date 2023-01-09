@@ -75,7 +75,7 @@ nucleosomeCoveragePlot <- function(sample_bed) {
   # plot histogram of cfDNA coverage
 
   #library(ggplot2)
-  plot_control <- ggplot2::ggplot(coverage_df, mapping=aes(x=chromosome_location)) +
+  plot_control <- ggplot2::ggplot(coverage_df, mapping=aes(x=coverage)) +
     geom_density() +
     ggtitle("Patients")
 

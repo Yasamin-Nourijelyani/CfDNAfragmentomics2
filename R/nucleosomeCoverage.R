@@ -104,6 +104,8 @@
 #'
 #' cov <- nucleosomeCoverage(sample_bed = sample_bed)
 #' cov
+#' # check for instance
+#' cov[2985822, 1]
 #'
 #' }
 #'
@@ -135,7 +137,6 @@ nucleosomeCoverage <- function(sample_bed){
 
 
 
-  # check for instance coverage[2985822]
   return(as.data.frame(coverage))
 
 
