@@ -77,6 +77,8 @@ sample_bed <- read.table(sample_bed_file, header = FALSE, sep="\t",stringsAsFact
 
 cov <- nucleosomeCoverage(sample_bed = sample_bed)
 cov
+# check for instance
+cov[2985822, 1]
 
 }
 

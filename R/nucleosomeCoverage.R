@@ -125,11 +125,14 @@ nucleosomeCoverage <- function(sample_bed){
   # coverage array
   coverage = c(1:chromosome_length) * 0
 
+  # The leftmost location of chromosome read
+  minimum_read <- min(sample_bed[, 2])
+
   #row in bed file (1 cfDNA)
   for (i in c(1:nrow(sample_bed))){
       #traverse the length of the cfDNA fragment
       for (j in c(sample_bed[i, 2]:sample_bed[i, 3])){
-        coverage[j] =  coverage[j] + 1
+        coverage[j - minimum_read] =  coverage[j - minimum_read] + 1
 
       }
     }
