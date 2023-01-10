@@ -2,7 +2,7 @@
 # Author: Yasamin Nouri Jelyani
 # Date: 2022-12-05
 # Version: 0.1.0
-# Bugs and Issues: Does not produce plots
+# Bugs and Issues: Does not produce plots because chromosome length is too long to put on the x-axis
 
 #------------------------Exported Function------------------------
 
