@@ -249,7 +249,9 @@ York. ISBN 978-3-319-24277-4, https://ggplot2.tidyverse.org
 ## Acknowledgements
 
 
-This package was developed as part of an assessment for 2022-2023 BCB430H: Research Course at the University of Toronto, Toronto, CANADA. `CfDNAfragmentomics` welcomes issues, enhancement requests, and other contributions. To submit an issue, use the [GitHub issues](https://github.com/Yasamin-Nourijelyani/CfDNAfragmentomics/issues). Many thanks to those who provided feedback to improve this package.
+This package was developed by Yasamin Nouri Jelyani for BCB430: Research Course 
+at the University of Toronto, Toronto, CANADA. 
+`CfDNAfragmentomics` welcomes issues, enhancement requests, and other contributions. To submit an issue, use the [GitHub issues](https://github.com/Yasamin-Nourijelyani/CfDNAfragmentomics/issues). Many thanks to those who provided feedback to improve this package.
 
 
 
