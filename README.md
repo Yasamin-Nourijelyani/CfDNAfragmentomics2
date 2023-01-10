@@ -270,8 +270,11 @@ is from Jonathan Broadbent.
 ## Acknowledgements
 
 This package was developed by Yasamin Nouri Jelyani for BCB430: Research
-Course at the University of Toronto, Toronto, CANADA.
-`CfDNAfragmentomics` welcomes issues, enhancement requests, and other
-contributions. To submit an issue, use the [GitHub
+Course under the supervision of Professor Jared Simpson and Jonathan
+Broadbent. The package backbone was originally developed as part of the
+BCB420 course (Fall 2022) Taught by Professor Anjali Silva. at the
+University of Toronto, Toronto, CANADA. `CfDNAfragmentomics` welcomes
+issues, enhancement requests, and other contributions. To submit an
+issue, use the [GitHub
 issues](https://github.com/Yasamin-Nourijelyani/CfDNAfragmentomics/issues).
 Many thanks to those who provided feedback to improve this package.
