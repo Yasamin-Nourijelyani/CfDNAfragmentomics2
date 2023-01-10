@@ -27,6 +27,12 @@
 #' the paper by Katsman et. al (1).
 #' These samples are compared to the controls using a t-test.
 #'
+#' @param chromosome_length The integer length of the chromosome being analysed
+#' Lengths can also be referenced from http://www.insilicase.com/Web/Chromlen.aspx
+#' given the chromosome number.
+#'
+#'
+#'
 #' @return Returns a plot of cfDNA coverage
 #'
 #' @references
@@ -50,13 +56,13 @@
 #'
 #' # Example 1:
 #'
-#' sample_bed_file <- system.file("extdata", "p1.bed", package = "CfDNAfragmentomics")
+#' sample_bed_file <- system.file("extdata", "d1.bed", package = "CfDNAfragmentomics")
 #' sample_bed <- read.table(sample_bed_file, header = FALSE, sep="\t",stringsAsFactors=FALSE, quote="")
 #'
 #' ## basic usage
 #'
 #' library(ggplot2)
-#' plot <- nucleosomeCoveragePlot(sample_bed = sample_bed)
+#' plot <- nucleosomeCoveragePlot(sample_bed = sample_bed, 237995947)
 #'
 #'
 #'
@@ -68,16 +74,18 @@
 #' @import ggplot2
 #' @importFrom gridExtra grid.arrange
 
-nucleosomeCoveragePlot <- function(sample_bed) {
+nucleosomeCoveragePlot <- function(sample_bed, chromosome_length) {
 
-  coverage_df <- nucleosomeCoverage(sample_bed)
+  coverage_df <- nucleosomeCoverage(sample_bed, chromosome_length)
 
   # plot histogram of cfDNA coverage
 
   #library(ggplot2)
-  plot_control <- ggplot2::ggplot(coverage_df, mapping=aes(x=coverage)) +
-    geom_density() +
+  plot_coverage<-ggplot(coverage_df, aes(x = nucleotide, y = coverage)) +
+    geom_point() +
     ggtitle("Patients")
+
+
 
 }
 

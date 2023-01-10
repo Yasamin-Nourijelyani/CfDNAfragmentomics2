@@ -3,7 +3,17 @@
 # Concept from: Jonathan Broadbent
 # Date: 2022-12-20
 # Version: 0.1.0
-# Bugs and Issues: Takes too long to run
+# Bugs and Issues: Right now, we have low coverage as you can see
+# in the daftaframe for coverage, we have 0 and 1 and max 5 coverage at a nucleotide position
+# to get greater coverage, find the nucleotide position of TFBS. Aggregate all of those
+# TFBS positions, and alighn then like the important first griffin paper image. site1, site2, site 3
+# can be cromosome 8 bases 300-799, site 2 can be chromosome 22 at position 209-673,
+# and site 3 can be chromosoem 3 at position 22-109. TF A binds to the mid position of
+#all three sites. SO we alighn them like in the image, as if they are all
+# in one location. Then, we mark that position as position 0, anything before as negative positions
+# and anything after as positive positions. Then, we will have higher coverage, of around 300X since
+# we have now more nucleotides at the position 0 because we put together all the
+# TFBS at that position for TF A. Read Griffin for more details.
 
 
 #------------------------Exported Function------------------------
@@ -61,6 +71,10 @@
 #' of patients will be compared to these healthy data similar to what is done in
 #' the paper by Katsman et. al (1).
 #'
+#' @param chromosome_length The integer length of the chromosome being analysed
+#' Lengths can also be referenced from http://www.insilicase.com/Web/Chromlen.aspx
+#' given the chromosome number.
+#'
 #'
 #' #TODO:
 #' add references to content above.
@@ -102,7 +116,10 @@
 #'
 #' # Example 1:
 #'
-#' cov <- nucleosomeCoverage(sample_bed = sample_bed)
+#' ## Note: example does not work because the chromosome1 length is shoerter
+#' than the chromosome length in sample bed file
+#'
+#' cov <- nucleosomeCoverage(sample_bed = sample_bed, 237995947)
 #' cov
 #' # check for instance
 #' cov[2985822, 1]
@@ -113,34 +130,34 @@
 #' @export
 
 
-nucleosomeCoverage <- function(sample_bed){
+nucleosomeCoverage <- function(sample_bed, chromosome_length){
 
   #check if the input values are correct.
-  if (! is.data.frame(sample_bed)) {
+  if (! is.data.frame(sample_bed) | ! is.numeric(chromosome_length)) {
     stop("Please put valid inputs for nucleosomeCoverage function")
   }
 
-  # the maximum length of cfDNA in this file
-  chromosome_length = as.numeric(max(sample_bed[, 3]) - min(sample_bed[, 2]))
   # coverage array
   coverage = c(1:chromosome_length) * 0
-
-  # The leftmost location of chromosome read
-  minimum_read <- min(sample_bed[, 2])
 
   #row in bed file (1 cfDNA)
   for (i in c(1:nrow(sample_bed))){
       #traverse the length of the cfDNA fragment
       for (j in c(sample_bed[i, 2]:sample_bed[i, 3])){
-        coverage[j - minimum_read] =  coverage[j - minimum_read] + 1
+        coverage[j] =  coverage[j] + 1
+        # This will provide us with low coverage, over the entire chromosome
+        # to get high coverage, we will check the TFBS for the same
+        # TF, and overlay them on top of eachother.
 
       }
-    }
+  }
+  coverage <- as.data.frame(coverage)
+  coverage$nucleotide <- 1:chromosome_length
 
 
 
 
-  return(as.data.frame(coverage))
+  return(coverage)
 
 
 }

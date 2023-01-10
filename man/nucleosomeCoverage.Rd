@@ -5,7 +5,7 @@
 \title{Nucleosome coverage plots for chromosome positions. Used to find Transcription
 Factor Binding Sites (TFBS)}
 \usage{
-nucleosomeCoverage(sample_bed)
+nucleosomeCoverage(sample_bed, chromosome_length)
 }
 \arguments{
 \item{sample_bed}{A dataframe for the a sample data
@@ -18,7 +18,11 @@ the read.
 These are the patient who we want to check if they have cancer or not.
 The fragment lengths
 of patients will be compared to these healthy data similar to what is done in
-the paper by Katsman et. al (1).
+the paper by Katsman et. al (1).}
+
+\item{chromosome_length}{The integer length of the chromosome being analysed
+Lengths can also be referenced from http://www.insilicase.com/Web/Chromlen.aspx
+given the chromosome number.
 
 #TODO:
 add references to content above.}
@@ -75,7 +79,10 @@ sample_bed <- read.table(sample_bed_file, header = FALSE, sep="\t",stringsAsFact
 
 # Example 1:
 
-cov <- nucleosomeCoverage(sample_bed = sample_bed)
+## Note: example does not work because the chromosome1 length is shoerter
+than the chromosome length in sample bed file
+
+cov <- nucleosomeCoverage(sample_bed = sample_bed, 237995947)
 cov
 # check for instance
 cov[2985822, 1]
