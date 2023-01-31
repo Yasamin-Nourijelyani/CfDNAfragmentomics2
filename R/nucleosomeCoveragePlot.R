@@ -74,9 +74,8 @@
 #' @import ggplot2
 #' @importFrom gridExtra grid.arrange
 
-nucleosomeCoveragePlot <- function(sample_bed, chromosome_length) {
-
-  coverage_df <- nucleosomeCoverage(sample_bed, chromosome_length)
+nucleosomeCoveragePlot <- function(coverage_df) {
+  # coverage_df is made from aggregation in aggregate_coverage function
 
   # plot histogram of cfDNA coverage
 
