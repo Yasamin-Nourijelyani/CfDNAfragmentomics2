@@ -18,6 +18,49 @@
 
 #------------------------Exported Function------------------------
 
+#'Return the tfbs from the csv inputted file
+#'
+#'@param csome_num the chromosome number of interest string like "chr1"
+#'
+#' @export
+
+aggregate_coverage_over_tfbs <- function(TFBS_csv, sample_bed, offset=500){
+
+
+  if (! requireNamespace("readr", quietly=TRUE)) {
+    install.packages("readr")
+  }
+  library(readr)
+  #example:
+  # TFBS_loc <- read_csv("inst/extdata/TFBS_loc.csv")
+  TFBS_loc <- read_csv(TFBS_csv)
+
+  #unique and valid chromosomes
+  csomes <- unique(TFBS_loc$chr)
+  csomes <- csomes[! is.na(csomes)]
+  #all coverage at a locus
+  aggregate_data <- data.frame()
+
+
+  for (chr in csomes){
+    tfbs_for_csome <- TFBS_loc[TFBS_loc$chr == chr]
+    #adjust midpoint with offset
+    start = tfbs_for_csome$mid_position - offset
+    end = tfbs_for_csome$mid_position + offset
+    coverage <- get_coverage(sample_bed, chr, start, end)
+    #bind row of coverage to dataframe
+    rbind(aggregate_data, coverage)
+
+  }
+  #sum of all coverage
+  final_high_coverage <- colSums(aggregate_data)
+
+
+
+}
+
+
+
 
 
 #' Nucleosome coverage plots for chromosome positions. Used to find Transcription
@@ -71,10 +114,12 @@
 #' of patients will be compared to these healthy data similar to what is done in
 #' the paper by Katsman et. al (1).
 #'
-#' @param chromosome_length The integer length of the chromosome being analysed
-#' Lengths can also be referenced from http://www.insilicase.com/Web/Chromlen.aspx
-#' given the chromosome number.
+#' @param chr the chromosome of interest. Is a string of format for example
+#' "chr1" for chromosome 1
 #'
+#' @param start the position of the cfDNA fragment
+#'
+#' @param end the ending position of the cfDNA fragment
 #'
 #' #TODO:
 #' add references to content above.
@@ -128,31 +173,42 @@
 #'
 #'
 #' @export
-
-
-nucleosomeCoverage <- function(sample_bed, chromosome_length){
+get_coverage <- function(sample_bed, chr, start, end){
 
   #check if the input values are correct.
   if (! is.data.frame(sample_bed) | ! is.numeric(chromosome_length)) {
     stop("Please put valid inputs for nucleosomeCoverage function")
   }
 
-  # coverage array
+  # coverage array. Now, position 1 on this array is start
+  chromosome_length = end - start
   coverage = c(1:chromosome_length) * 0
 
-  #row in bed file (1 cfDNA)
-  for (i in c(1:nrow(sample_bed))){
-      #traverse the length of the cfDNA fragment
-      for (j in c(sample_bed[i, 2]:sample_bed[i, 3])){
+  #start locations of all cfDNA fragments
+  start_cov <- sample_bed[ , 2][sample_bed[, 1] == chr]
+
+  #adjust all indexes to fit on coverage vector
+  start_cov <- start_cov - chromosome_length
+
+  #end locations of all cfDNA fragment
+  end_cov <- sample_bed[ , 3][sample_bed[, 1] == chr]
+
+  #adjust all indexes to fit on coverage vector
+  end_cov <- end_cov - chromosome_length
+
+  #go along the indexes of the start_cov array
+  for (i in seq_along(start_cov)){
+    #if the coverage is a number and is a valid start and finish
+    if(is.numeric(start_cov[i]) && is.numeric(end_cov[i]) && (end_cov[i] - start_cov[i] >= 0)){
+      for (j in start_cov[i]:end_cov[i]){
         coverage[j] =  coverage[j] + 1
-        # This will provide us with low coverage, over the entire chromosome
-        # to get high coverage, we will check the TFBS for the same
-        # TF, and overlay them on top of eachother.
 
       }
+    }
+
   }
+
   coverage <- as.data.frame(coverage)
-  coverage$nucleotide <- 1:chromosome_length
 
 
 
