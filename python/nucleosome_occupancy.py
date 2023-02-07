@@ -26,6 +26,7 @@ def aggregate_coverage(coverage, tfbs, window):
     aggregate_coverage = np.zeros(2*window+1)
     with open(tfbs, 'r') as tfbs:
         reader = csv.reader(tfbs, delimiter='\t')
+        # TODO: Edit this line based on the format of the TFBS file (im not sure how many blanks there should be there)
         for chr, _, _, _, midpoint in reader:
             start = midpoint - window
             end = midpoint + window
