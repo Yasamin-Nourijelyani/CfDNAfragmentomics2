@@ -40,6 +40,8 @@ def get_coverage(bed_file):
     :param bed_file: The bed file to get the coverage from
     :return: A list of coverage values
     """
+    
+    # create a dictionary {chr1: 0, chr2: 1}
     coverage = {'chr{}'.format(i): np.zeros(249*10**6) for i in range(1, 23)}
     with open(bed_file, 'r') as bed:
         reader = csv.reader(bed, delimiter='\t')

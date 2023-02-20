@@ -18,14 +18,24 @@
 
 #------------------------Exported Function------------------------
 
-#'Return the tfbs from the csv inputted file
 #'
-#'@param csome_num the chromosome number of interest string like "chr1"
+#'aggregate the coverage vectors across every window in the tfbs file
+#'
+#'
+#' @param coverage a dictonary of chromosome names and coverage vectors
+#' @param tfbs: path to the tfbs file
+#' @param window: the size of the window to aggregate over
+#'
+#'
+#' @return: aggregated coverage vector
+#'
 #'
 #' @export
+aggregate_coverage <- function(bed_file, tfbs, window){
 
-aggregate_coverage_over_tfbs <- function(TFBS_csv, sample_bed, offset=500){
+  coverage <- get_coverage(bed_file)
 
+  agg_coverage <- numeric(2*window + 1)
 
   if (! requireNamespace("readr", quietly=TRUE)) {
     install.packages("readr")
@@ -33,29 +43,15 @@ aggregate_coverage_over_tfbs <- function(TFBS_csv, sample_bed, offset=500){
   library(readr)
   #example:
   # TFBS_loc <- read_csv("inst/extdata/TFBS_loc.csv")
-  TFBS_loc <- read_csv(TFBS_csv)
+  TFBS_loc <- read_csv(tfbs)
 
-  #unique and valid chromosomes
-  csomes <- unique(TFBS_loc$chr)
-  csomes <- csomes[! is.na(csomes)]
-  #all coverage at a locus
-  aggregate_data <- data.frame()
-
-
-  for (chr in csomes){
-    tfbs_for_csome <- TFBS_loc[TFBS_loc$chr == chr]
-    #adjust midpoint with offset
-    start = tfbs_for_csome$mid_position - offset
-    end = tfbs_for_csome$mid_position + offset
-    coverage <- get_coverage(sample_bed, chr, start, end)
-    #bind row of coverage to dataframe
-    rbind(aggregate_data, coverage)
-
+  for (row in 1:nrow(tfbs)){
+    start = tfbs$mid_position - window
+    start = tfbs$mid_position + window
+    agg_coverag = agg_coverage + coverage[[tfbs$chr]][start:end]
   }
-  #sum of all coverage
-  final_high_coverage <- colSums(aggregate_data)
 
-
+  return(agg_coverage)
 
 }
 
@@ -63,25 +59,7 @@ aggregate_coverage_over_tfbs <- function(TFBS_csv, sample_bed, offset=500){
 
 
 
-#' Nucleosome coverage plots for chromosome positions. Used to find Transcription
-#' Factor Binding Sites (TFBS)
-#'
-#'TFBS can be used to subtype cancer DNA. Transcription Factors (TFs)bind to
-#'specific regions of specific kinds of DNA, to allow for their transcription.
-#'The binding of the TFs allow for generation of RNA from that DNA region.
-#'It is important to note that regions that are binded by TFs are not bound
-#'by nucleosomes (to allow for binding of the TF protein). However, other
-#'regions of the DNA are bound by these nucleosomes, protecting the DNA from
-#'degradation. cfDNA samples that do not have TF bound, do not have
-#'nucleosomes bound at the region where TF usually binds. Hence, they are
-#'not protected from nuclease degradation. This lead to the cfDNA to be cut at
-#'the TF binding sites since those sites are unprotected. Hence, cfDNA fragment
-#'ends if many of the cfDNA are cut at that certain region can be used as an
-#'indicator for TF binding sites. Hence, coverage plots are used to detect the
-#'amount of coverage by the cfDNA molecules on the DNA. If the coverage is low,
-#'that could indicate the existance of a TFBS in that region.
-#'The coverage plots are created using the nucleosomeCoverage data structure.
-#'
+#' Get the coverage at every locus in the interval [start, end]
 #'
 #' Note 1: The data to generate examples are from the illumina website (4).
 #'  This example data is not representative of real patient data due to
@@ -102,7 +80,8 @@ aggregate_coverage_over_tfbs <- function(TFBS_csv, sample_bed, offset=500){
 #' excepted.
 #'
 #'
-#' @param sample_bed A dataframe for the a sample data
+#' @param bed_file: The bed file to get the coverage from
+#'  A dataframe for the a sample data
 #' (unknown if cancerous or not individual)
 #'  with at least 3 columns: first column is a string representing the chromosome
 #'  number for the cfDNA for instance: "chr1",
@@ -114,19 +93,11 @@ aggregate_coverage_over_tfbs <- function(TFBS_csv, sample_bed, offset=500){
 #' of patients will be compared to these healthy data similar to what is done in
 #' the paper by Katsman et. al (1).
 #'
-#' @param chr the chromosome of interest. Is a string of format for example
-#' "chr1" for chromosome 1
-#'
-#' @param start the position of the cfDNA fragment
-#'
-#' @param end the ending position of the cfDNA fragment
 #'
 #' #TODO:
 #' add references to content above.
 #'
-#' @return Return an dataframe of nucleosome coverage:
-#' value refer to the number of cfDNA fragments that cover the region of the
-#' nucleosome.
+#' @return A list of coverage values
 #'
 #' @references
 #' 1- Katsman, E., Orlanski, S., Martignano, F., Fox-Fisher, I., Shemer,
@@ -164,7 +135,7 @@ aggregate_coverage_over_tfbs <- function(TFBS_csv, sample_bed, offset=500){
 #' ## Note: example does not work because the chromosome1 length is shoerter
 #' than the chromosome length in sample bed file
 #'
-#' cov <- nucleosomeCoverage(sample_bed = sample_bed, 237995947)
+#' cov <- get_coverage(bed_file = sample_bed)
 #' cov
 #' # check for instance
 #' cov[2985822, 1]
@@ -172,51 +143,38 @@ aggregate_coverage_over_tfbs <- function(TFBS_csv, sample_bed, offset=500){
 #' }
 #'
 #'
-#' @export
-get_coverage <- function(sample_bed, chr, start, end){
+#'
+get_coverage <- function(bed_file){
+
+  # create a dictionary with format: {chr1: 0...00, chr2: 0..00}
+  coverage <- list()
+  for (i in 1:22) {
+    chrom <- paste0("chr", i)
+    coverage[[chrom]] <- numeric(249*10**2)
+  }
 
   #check if the input values are correct.
-  if (! is.data.frame(sample_bed) | ! is.numeric(chromosome_length)) {
+  if (! is.data.frame(bed_file)) {
     stop("Please put valid inputs for nucleosomeCoverage function")
   }
 
-  # coverage array. Now, position 1 on this array is start
-  chromosome_length = end - start
-  coverage = c(1:chromosome_length) * 0
-
-  #start locations of all cfDNA fragments
-  start_cov <- sample_bed[ , 2][sample_bed[, 1] == chr]
-
-  #adjust all indexes to fit on coverage vector
-  start_cov <- start_cov - chromosome_length
-
-  #end locations of all cfDNA fragment
-  end_cov <- sample_bed[ , 3][sample_bed[, 1] == chr]
-
-  #adjust all indexes to fit on coverage vector
-  end_cov <- end_cov - chromosome_length
 
   #go along the indexes of the start_cov array
-  for (i in seq_along(start_cov)){
-    #if the coverage is a number and is a valid start and finish
-    if(is.numeric(start_cov[i]) && is.numeric(end_cov[i]) && (end_cov[i] - start_cov[i] >= 0)){
-      for (j in start_cov[i]:end_cov[i]){
-        coverage[j] =  coverage[j] + 1
-
-      }
+  for (row in 1:nrow(bed_file)){
+    chr = bed_file[row, 1]
+    start = bed_file[row, 2]
+    end = bed_file[row, 3]
+    for (i in range(start, end + 1)){
+      coverage[[chr]][i] =  coverage[[chr]][i] + 1
     }
 
   }
-
-  coverage <- as.data.frame(coverage)
-
-
-
 
   return(coverage)
 
 
 }
+
 
 
 
