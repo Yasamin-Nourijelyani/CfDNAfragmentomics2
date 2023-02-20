@@ -1,17 +1,22 @@
 # Write some python boiler plate code
 # Import the necessary modules
+from tqdm import tqdm
 import numpy as np
 import argparse
 import csv
 from collections import defaultdict
 import matplotlib.pyplot as plt
+from scipy import signal
 
-def plot_coverage(coverage):
+def plot_coverage(coverage, name):
     """
     Plot the coverage of the nucleosome occupancy in a line plot
     """
-    plt.plot(coverage)
-    plt.savefig('nucleosome_occupancy.png')
+    x = np.linspace(-1000, 1000, 2001)
+    # smooth with a savitzky golay filter
+    y = signal.savgol_filter(coverage, 51, 3)
+    plt.plot(x, y)
+    plt.savefig(f'{name}.NO.png')
 
 
 def aggregate_coverage(coverage, tfbs, window):
@@ -26,10 +31,16 @@ def aggregate_coverage(coverage, tfbs, window):
     aggregate_coverage = np.zeros(2*window+1)
     with open(tfbs, 'r') as tfbs:
         reader = csv.reader(tfbs, delimiter='\t')
-        for chr, _, _, _, midpoint in reader:
+        header = next(reader)
+        # map the header to the index of the column
+        header = {header[i]: i for i in range(len(header))}
+        print("Aggregating coverage")
+        for row in tqdm(reader):
+            chr = row[header['chr']]
+            midpoint = int(row[header['mid_position']])
             start = midpoint - window
             end = midpoint + window
-            aggregate_coverage += coverage[chr][start:end]
+            aggregate_coverage += coverage[chr][start:end+1]
 
     return aggregate_coverage
 
@@ -40,12 +51,15 @@ def get_coverage(bed_file):
     :param bed_file: The bed file to get the coverage from
     :return: A list of coverage values
     """
-    
-    # create a dictionary {chr1: 0, chr2: 1}
-    coverage = {'chr{}'.format(i): np.zeros(249*10**6) for i in range(1, 23)}
+
+    coverage = defaultdict(lambda: np.zeros(249*10**6))
     with open(bed_file, 'r') as bed:
         reader = csv.reader(bed, delimiter='\t')
-        for chr, start, end in reader:
+        print("Getting coverage")
+        for row in tqdm(reader):
+            chr = row[0]
+            start = int(row[1])
+            end = int(row[2])
             for i in range(start, end+1):
                 coverage[chr][i] += 1
 
@@ -61,8 +75,8 @@ def main():
     args = parser.parse_args()
 
     coverage = get_coverage(args.input)
-    aggregate_coverage = aggregate_coverage(coverage, args.tfbs, args.window)
-    plot_coverage(aggregate_coverage)
+    aggregated_coverage = aggregate_coverage(coverage, args.tfbs, args.window)
+    plot_coverage(aggregated_coverage, args.input.split('.')[1])
 
 if __name__ == '__main__':
     main()
