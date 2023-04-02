@@ -4,7 +4,7 @@
 \alias{nucleosomeCoveragePlot}
 \title{Plot of the coverage for cfDNA fragments}
 \usage{
-nucleosomeCoveragePlot(sample_bed)
+nucleosomeCoveragePlot(coverage_df)
 }
 \arguments{
 \item{sample_bed}{A dataframe for the a sample data
@@ -19,6 +19,10 @@ The fragment lengths
 of patients will be compared to these healthy data similar to what is done in
 the paper by Katsman et. al (1).
 These samples are compared to the controls using a t-test.}
+
+\item{chromosome_length}{The integer length of the chromosome being analysed
+Lengths can also be referenced from http://www.insilicase.com/Web/Chromlen.aspx
+given the chromosome number.}
 }
 \value{
 Returns a plot of cfDNA coverage
@@ -33,13 +37,13 @@ detect TFBS.
 
 # Example 1:
 
-sample_bed_file <- system.file("extdata", "p1.bed", package = "CfDNAfragmentomics")
+sample_bed_file <- system.file("extdata", "d1.bed", package = "CfDNAfragmentomics")
 sample_bed <- read.table(sample_bed_file, header = FALSE, sep="\t",stringsAsFactors=FALSE, quote="")
 
 ## basic usage
 
 library(ggplot2)
-plot <- nucleosomeCoveragePlot(sample_bed = sample_bed)
+plot <- nucleosomeCoveragePlot(sample_bed = sample_bed, 237995947)
 
 
 

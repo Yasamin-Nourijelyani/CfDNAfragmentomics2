@@ -14,11 +14,11 @@ ui <- fluidPage(
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
 
-      # Sidebar panel for inputs ----
+    # Sidebar panel for inputs ----
     sidebarPanel(
 
       tags$p("This is a Shiny App that is part of the CfDNAfragmentomics
-              package in R. Its purpose is to perform t-test
+              package in R. Its purpose is to perform Wilcoxon Rank Sum-test
              analysis and plotting of cfDNA fragmentome data."),
       # br() element to introduce extra vertical spacing ----
       br(),
@@ -26,7 +26,7 @@ ui <- fluidPage(
       tags$b("Description: CfDNAfragmentomics is an R package used
           to find significance of difference in cfDNA length fragments
           between patient and control data. This Shiny App is part of the
-          CfDNAfragmentomics pakage. It permits to calculate the t-test
+          CfDNAfragmentomics pakage. It permits to calculate the Wilcoxon Rank Sum-test
           for the variation in cfDNA fragment sizes,
           and significance of difference between patient and control data,
           and compares the sizes of the cfDNA to predict if the patient
@@ -57,13 +57,13 @@ ui <- fluidPage(
       actionButton(inputId = "data2",
                    label = "Dataset 2 Details"),
       fileInput(inputId = "file1",
-                 label = "Select a cfDNA bed file of patient data. File should
+                label = "Select a cfDNA bed file of patient data. File should
                 be in .bed or .txt format rows corresponding
                 to chromosome regions and tab seperated columns
                 corresponding to chromosome, start, and end points.",
                 accept = c(".bed", ".txt")),
       fileInput(inputId = "file2",
-                 label = "Select a cfDNA bed file of control data.
+                label = "Select a cfDNA bed file of control data.
                 File should be in .bed or .txt format with rows corresponding
                 to chromosome regions and tab seperated columns corresponding
                 to chromosome, start, and end points.",
@@ -76,14 +76,14 @@ ui <- fluidPage(
                 This should be a positive decimal value less than 1:", "0.05"),
 
 
-       # br() element to introduce extra vertical spacing ----
-       br(),
+      # br() element to introduce extra vertical spacing ----
+      br(),
 
-        # actionButton
-        actionButton(inputId = "button2",
-                     label = "Run"),
+      # actionButton
+      actionButton(inputId = "button2",
+                   label = "Run"),
 
-      ),
+    ),
 
     # Main panel for displaying outputs ----
     mainPanel(
@@ -97,11 +97,11 @@ ui <- fluidPage(
                               densities:"),
                            br(),
                            plotOutput("density_plot_out")
-                    ), #close plot panel
-                  tabPanel("Result of the t-test",
+                  ), #close plot panel
+                  tabPanel("Result of the Wilcox-test",
                            h3("Instructions: Enter values and click 'Run' at
                               the bottom left side."),
-                           h3("Result of the t-test:"),
+                           h3("Result of the wilcox-test:"),
                            h5("If the result is True, then for the inputted
                               patient data set, the mononucleosome
                               and dinucleosome cfDNA  fragment sizes are
@@ -129,7 +129,7 @@ ui <- fluidPage(
                            h5("Calculated p-value for dinucleosome cfDNA lengths"),
                            verbatimTextOutput("ttest_out_di")
 
-                           ),#close verbatim panel
+                  ),#close verbatim panel
                   tabPanel("Plot of cfDNA coverage",
                            h3("Instructions: Enter values and click 'Run'
                               at the bottom left side."),
@@ -156,7 +156,7 @@ ui <- fluidPage(
 
     ) #close main
 
-)
+  )
 ) #close iu
 
 # Define server logic for random distribution app ----
@@ -168,11 +168,11 @@ server <- function(input, output) {
 
     if (!is.null(input$file1) & !is.null(input$file2))
       file1_acc <- input$file1
-      file2_acc <- input$file2
-      sample_bed_f <- read.table(file1_acc$datapath, header = FALSE,
-                                 sep="\t", stringsAsFactors=FALSE, quote="")
-      controls_bed_f <- read.table(file2_acc$datapath, header = FALSE, sep="\t",
-                                   stringsAsFactors=FALSE, quote="")
+    file2_acc <- input$file2
+    sample_bed_f <- read.table(file1_acc$datapath, header = FALSE,
+                               sep="\t", stringsAsFactors=FALSE, quote="")
+    controls_bed_f <- read.table(file2_acc$datapath, header = FALSE, sep="\t",
+                                 stringsAsFactors=FALSE, quote="")
 
 
     CfDNAfragmentomics::nucleosomeRatio(
@@ -183,17 +183,17 @@ server <- function(input, output) {
 
 
 
-    })
+  })
 
   start_plotting <- eventReactive(eventExpr = input$button2, {
 
     if (!is.null(input$file1) & !is.null(input$file2))
       file1_acc <- input$file1
-      file2_acc <- input$file2
-      sample_bed_f <- read.table(file1_acc$datapath, header = FALSE, sep="\t",
+    file2_acc <- input$file2
+    sample_bed_f <- read.table(file1_acc$datapath, header = FALSE, sep="\t",
+                               stringsAsFactors=FALSE, quote="")
+    controls_bed_f <- read.table(file2_acc$datapath, header = FALSE, sep="\t",
                                  stringsAsFactors=FALSE, quote="")
-      controls_bed_f <- read.table(file2_acc$datapath, header = FALSE, sep="\t",
-                                   stringsAsFactors=FALSE, quote="")
 
 
 
@@ -244,13 +244,13 @@ server <- function(input, output) {
   })
 
 
-  # Text output for t-test analysis
+  # Text output for U-test analysis
   output$ttest_out_mono <- renderPrint({
     if (! is.null(start_ttest))
       start_ttest()$ttest_mono_pvalue
   })
 
-  # Text output for t-test analysis
+  # Text output for U-test analysis
   output$ttest_out_di <- renderPrint({
     if (! is.null(start_ttest))
       start_ttest()$ttest_di_pvalue
@@ -260,7 +260,7 @@ server <- function(input, output) {
   output$density_plot_out <- renderPlot({
     if (! is.null(start_plotting))
 
-    start_plotting()
+      start_plotting()
 
   })
 

@@ -87,40 +87,39 @@ data(package = "CfDNAfragmentomics")
 browseVignettes("CfDNAfragmentomics")
 ```
 
--   Analysis function: *nucleosomeRatio*: Fragmentation sizes of cfDNA
-    molecules are potential cancer biomarkers (4). Hence, to find if a
-    patient data file contains cancer information, it can be compared
-    with a control dataset with known healthy cfDNA fragments. The
-    t-test is a parametric test used to determine significance of the
-    difference in fragment size of the control and patient cfDNA lengths
-    to determine if the patient data contains the cancer biomarker.
-    Here, we are comparing two independent samples, which are the
-    control and patient data, and we are making inference about the
-    state (cancer positive or negative) of the population of cfDNA
-    molecules in the patient as being potentially cancer positive or
-    negative. This function takes as input cfDNA read dataframes from
-    patient and controls, which can be read from .bed or .txt files.
-    This function also takes as input, p-values for the t-test analysis
-    of mononucleosomes and dinucleosomes. The function returns a list of
-    outputs. This list contains a real number: ttest_mono_pvalue, a real
-    number: ttest_di_pvalue, and a boolean value: cancerous.
-    ttest_mono_pvalue is the p-value calculated for the difference in
-    mononucleosome lengths between patient and controls, ttest_di_pvalue
-    is the p-value calculated for the difference in dinucleosome
-    lengths, and if the patient input files shows significant shorter
-    mononucleosome and dinucleosome sizes compared to the control with
-    respect to the inputted p-values that are considered significant,
-    cancerous will be TRUE. and cancerous will be FALSE otherwise. Note
-    that even if the p-values show significance, if the patient cfDNA
-    lengths are not shorter, then the patient is not considered as being
-    cancerous.
+- Analysis function: *nucleosomeRatio*: Fragmentation sizes of cfDNA
+  molecules are potential cancer biomarkers (4). Hence, to find if a
+  patient data file contains cancer information, it can be compared with
+  a control dataset with known healthy cfDNA fragments. The t-test is a
+  parametric test used to determine significance of the difference in
+  fragment size of the control and patient cfDNA lengths to determine if
+  the patient data contains the cancer biomarker. Here, we are comparing
+  two independent samples, which are the control and patient data, and
+  we are making inference about the state (cancer positive or negative)
+  of the population of cfDNA molecules in the patient as being
+  potentially cancer positive or negative. This function takes as input
+  cfDNA read dataframes from patient and controls, which can be read
+  from .bed or .txt files. This function also takes as input, p-values
+  for the t-test analysis of mononucleosomes and dinucleosomes. The
+  function returns a list of outputs. This list contains a real number:
+  ttest_mono_pvalue, a real number: ttest_di_pvalue, and a boolean
+  value: cancerous. ttest_mono_pvalue is the p-value calculated for the
+  difference in mononucleosome lengths between patient and controls,
+  ttest_di_pvalue is the p-value calculated for the difference in
+  dinucleosome lengths, and if the patient input files shows significant
+  shorter mononucleosome and dinucleosome sizes compared to the control
+  with respect to the inputted p-values that are considered significant,
+  cancerous will be TRUE. and cancerous will be FALSE otherwise. Note
+  that even if the p-values show significance, if the patient cfDNA
+  lengths are not shorter, then the patient is not considered as being
+  cancerous.
 
--   Plotting function: *nucleosomeDensityPlot*: A visualization function
-    that generates a density plot showing nucleosome fragment lengths
-    for control and patient data to visually compare the mono-nucleosome
-    and di-nucleosome fragment length densities. This function takes as
-    input cfDNA read dataframes from patient and controls, which can be
-    read from .bed or .txt files.
+- Plotting function: *nucleosomeDensityPlot*: A visualization function
+  that generates a density plot showing nucleosome fragment lengths for
+  control and patient data to visually compare the mono-nucleosome and
+  di-nucleosome fragment length densities. This function takes as input
+  cfDNA read dataframes from patient and controls, which can be read
+  from .bed or .txt files.
 
 Assumptions:  
 
@@ -270,9 +269,12 @@ is from Jonathan Broadbent.
 
 ## Acknowledgements
 
-This package was developed as part of an assessment for 2022-2023
-BCB430H: Research Course at the University of Toronto, Toronto, CANADA.
-`CfDNAfragmentomics` welcomes issues, enhancement requests, and other
-contributions. To submit an issue, use the [GitHub
+This package was developed by Yasamin Nouri Jelyani for BCB430: Research
+Course under the supervision of Professor Jared Simpson and Jonathan
+Broadbent. The package backbone was originally developed as part of the
+BCB420 course (Fall 2022) Taught by Professor Anjali Silva. at the
+University of Toronto, Toronto, CANADA. `CfDNAfragmentomics` welcomes
+issues, enhancement requests, and other contributions. To submit an
+issue, use the [GitHub
 issues](https://github.com/Yasamin-Nourijelyani/CfDNAfragmentomics/issues).
 Many thanks to those who provided feedback to improve this package.

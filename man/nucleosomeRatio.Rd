@@ -58,10 +58,11 @@ and cancerous will be FALSE otherwise. Note that even if the p-values show signi
 if the patient cfDNA lengths are not shorter, then the patient is not considered as being cancerous.
 }
 \description{
-Fragmentation sizes of cfDNA molecules are potential cancer biomarkers (1).
+Fragmentation sizes of cfDNA (cell free DNA) molecules are potential
+cancer biomarkers (1).
 Hence, to find if a patient data file contains cancer information,
 it can be compared with a control dataset with known healthy cfDNA fragments.
-The t-test is a parametric test used to determine
+The Wilcox test is a non-parametric test used to determine
 significance of the difference in fragment
 size of the control and patient cfDNA lengths to determine if the patient
 data contains the cancer biomarker.
@@ -74,12 +75,8 @@ data inputted to the functions are assumed to be reads for the specific loci
 corresponding to the cancer type of interest. Hence, both the control
 and patient data are required in the analysis to ensure the loci
 being analysed are corresponding to the specific cancer type of interest.
-Additionally, performing a parametric t-test assumes that the data is
-normally distributed (5). However, this may not always be assumed
-for real, patient data. Yet, in this analysis, this test will be performed,
-with the assumption that the data is normally distributed. Further
-work on this package can include non-parametric tests to eliminate the
-assumption of normally distributed data.
+Additionally, performing a non-parametric wilcox-test does not assume that the data is
+normally distributed (5).
 It is also assumed that the data is real human data and contains
 both mono-nucleosome and di-nucleosome length data.
 }
@@ -143,9 +140,4 @@ https://www.geeksforgeeks.org/mann-whitney-u-test-in-r-programming/.
 https://bedtools.readthedocs.io/en/latest/content/tools/bamtobed.html
 
 4- Illumina, https://support.illumina.com/downloads/nextera-flex-for-enrichment-BED-files.html
-
-5- “The T-Test.” JMP,
-https://www.jmp.com/en_ca/statistics-knowledge-portal/t-test.html#:~
-:text=t\%2DTest\%20assumptions&text=The\%20data\%20are\%20continuous.,
-The\%20distribution\%20is\%20approximately\%20normal.
 }

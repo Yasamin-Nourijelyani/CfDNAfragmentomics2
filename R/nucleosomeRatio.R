@@ -141,10 +141,11 @@ get_sample_mono <- function(sample_frag_sizes){
 #' Wilcox-Test of nucleosome ratios for patient and control cfDNA fragment
 #' reads data.
 #'
-#' Fragmentation sizes of cfDNA molecules are potential cancer biomarkers (1).
+#' Fragmentation sizes of cfDNA (cell free DNA) molecules are potential
+#' cancer biomarkers (1).
 #'  Hence, to find if a patient data file contains cancer information,
 #' it can be compared with a control dataset with known healthy cfDNA fragments.
-#' The t-test is a parametric test used to determine
+#' The Wilcox test is a non-parametric test used to determine
 #' significance of the difference in fragment
 #' size of the control and patient cfDNA lengths to determine if the patient
 #' data contains the cancer biomarker.
@@ -157,12 +158,8 @@ get_sample_mono <- function(sample_frag_sizes){
 #' corresponding to the cancer type of interest. Hence, both the control
 #' and patient data are required in the analysis to ensure the loci
 #' being analysed are corresponding to the specific cancer type of interest.
-#' Additionally, performing a parametric t-test assumes that the data is
-#' normally distributed (5). However, this may not always be assumed
-#'  for real, patient data. Yet, in this analysis, this test will be performed,
-#'  with the assumption that the data is normally distributed. Further
-#'  work on this package can include non-parametric tests to eliminate the
-#'  assumption of normally distributed data.
+#' Additionally, performing a non-parametric wilcox-test does not assume that the data is
+#' normally distributed (5).
 #'  It is also assumed that the data is real human data and contains
 #'  both mono-nucleosome and di-nucleosome length data.
 #'
@@ -242,10 +239,6 @@ get_sample_mono <- function(sample_frag_sizes){
 #'
 #' 4- Illumina, https://support.illumina.com/downloads/nextera-flex-for-enrichment-BED-files.html
 #'
-#' 5- “The T-Test.” JMP,
-#' https://www.jmp.com/en_ca/statistics-knowledge-portal/t-test.html#:~
-#' :text=t%2DTest%20assumptions&amp;text=The%20data%20are%20continuous.,
-#' The%20distribution%20is%20approximately%20normal.
 #'
 #'@examples
 #' \dontrun{
@@ -339,7 +332,7 @@ nucleosomeRatio <- function(controls_bed, sample_bed, di_nucleosome_p_value=0.05
 
   if (nrow(controls_mono_df) != 0 & nrow(patient_mono_df) != 0){
     w_test_mono <- stats::wilcox.test(as.numeric(controls_mono_df$length),
-                                as.numeric(patient_mono_df$length))
+                                      as.numeric(patient_mono_df$length))
 
   }
   else{
@@ -375,38 +368,38 @@ nucleosomeRatio <- function(controls_bed, sample_bed, di_nucleosome_p_value=0.05
     # there is significant difference in the sizes of
     # patient and control mono- and di- nucleosomes
 
-      # check if patient fragment lengths for mono and di nucleosomes
-      # are shorter, which is a biomarker for cancer.
+    # check if patient fragment lengths for mono and di nucleosomes
+    # are shorter, which is a biomarker for cancer.
 
-      if ((mean(controls_mono_df$length) >
-          mean(patient_mono_df$length)) &
-          (mean(controls_di_df$length) >
-          mean(patient_di_df$length))){
+    if ((mean(controls_mono_df$length) >
+         mean(patient_mono_df$length)) &
+        (mean(controls_di_df$length) >
+         mean(patient_di_df$length))){
 
-          #if the average sizes of the patient are shorter (significantly)
-          #compared the control,then the sample is likely cancerous,
-          #so return true
-          Results <- list(wtest_mono_pvalue = w_test_mono$p.value,
-                          wtest_di_pvalue = w_test_di$p.value,
-                          cancerous = TRUE)
+      #if the average sizes of the patient are shorter (significantly)
+      #compared the control,then the sample is likely cancerous,
+      #so return true
+      Results <- list(wtest_mono_pvalue = w_test_mono$p.value,
+                      wtest_di_pvalue = w_test_di$p.value,
+                      cancerous = TRUE)
 
-          return(Results)
+      return(Results)
 
-      }else{ #the sample lengths are not significantly shorter
-          Results <- list(wtest_mono_pvalue = w_test_mono$p.value,
-                          wtest_di_pvalue = w_test_di$p.value,
-                          cancerous = FALSE)
-
-          return(Results)
-      }
-
-  }else { #the difference between sample and control is not significant
-
+    }else{ #the sample lengths are not significantly shorter
       Results <- list(wtest_mono_pvalue = w_test_mono$p.value,
                       wtest_di_pvalue = w_test_di$p.value,
                       cancerous = FALSE)
 
-      return(Results)  }
+      return(Results)
+    }
+
+  }else { #the difference between sample and control is not significant
+
+    Results <- list(wtest_mono_pvalue = w_test_mono$p.value,
+                    wtest_di_pvalue = w_test_di$p.value,
+                    cancerous = FALSE)
+
+    return(Results)  }
 }
 
 

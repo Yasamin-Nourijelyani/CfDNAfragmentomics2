@@ -3,32 +3,63 @@
 # Concept from: Jonathan Broadbent
 # Date: 2022-12-20
 # Version: 0.1.0
-# Bugs and Issues: Takes too long to run
+# Bugs and Issues: Right now, we have low coverage as you can see
+# in the daftaframe for coverage, we have 0 and 1 and max 5 coverage at a nucleotide position
+# to get greater coverage, find the nucleotide position of TFBS. Aggregate all of those
+# TFBS positions, and alighn then like the important first griffin paper image. site1, site2, site 3
+# can be cromosome 8 bases 300-799, site 2 can be chromosome 22 at position 209-673,
+# and site 3 can be chromosoem 3 at position 22-109. TF A binds to the mid position of
+#all three sites. SO we alighn them like in the image, as if they are all
+# in one location. Then, we mark that position as position 0, anything before as negative positions
+# and anything after as positive positions. Then, we will have higher coverage, of around 300X since
+# we have now more nucleotides at the position 0 because we put together all the
+# TFBS at that position for TF A. Read Griffin for more details.
 
 
 #------------------------Exported Function------------------------
 
+#'
+#'aggregate the coverage vectors across every window in the tfbs file
+#'
+#'
+#' @param coverage a dictonary of chromosome names and coverage vectors
+#' @param tfbs: path to the tfbs file
+#' @param window: the size of the window to aggregate over
+#'
+#'
+#' @return: aggregated coverage vector
+#'
+#'
+#' @export
+aggregate_coverage <- function(bed_file, tfbs, window){
+
+  coverage <- get_coverage(bed_file)
+
+  agg_coverage <- numeric(2*window + 1)
+
+  if (! requireNamespace("readr", quietly=TRUE)) {
+    install.packages("readr")
+  }
+  library(readr)
+  #example:
+  # TFBS_loc <- read_csv("inst/extdata/TFBS_loc.csv")
+  TFBS_loc <- read_csv(tfbs)
+
+  for (row in 1:nrow(tfbs)){
+    start = tfbs$mid_position - window
+    start = tfbs$mid_position + window
+    agg_coverag = agg_coverage + coverage[[tfbs$chr]][start:end]
+  }
+
+  return(agg_coverage)
+
+}
 
 
-#' Nucleosome coverage plots for chromosome positions. Used to find Transcription
-#' Factor Binding Sites (TFBS)
-#'
-#'TFBS can be used to subtype cancer DNA. Transcription Factors (TFs)bind to
-#'specific regions of specific kinds of DNA, to allow for their transcription.
-#'The binding of the TFs allow for generation of RNA from that DNA region.
-#'It is important to note that regions that are binded by TFs are not bound
-#'by nucleosomes (to allow for binding of the TF protein). However, other
-#'regions of the DNA are bound by these nucleosomes, protecting the DNA from
-#'degradation. cfDNA samples that do not have TF bound, do not have
-#'nucleosomes bound at the region where TF usually binds. Hence, they are
-#'not protected from nuclease degradation. This lead to the cfDNA to be cut at
-#'the TF binding sites since those sites are unprotected. Hence, cfDNA fragment
-#'ends if many of the cfDNA are cut at that certain region can be used as an
-#'indicator for TF binding sites. Hence, coverage plots are used to detect the
-#'amount of coverage by the cfDNA molecules on the DNA. If the coverage is low,
-#'that could indicate the existance of a TFBS in that region.
-#'The coverage plots are created using the nucleosomeCoverage data structure.
-#'
+
+
+
+#' Get the coverage at every locus in the interval [start, end]
 #'
 #' Note 1: The data to generate examples are from the illumina website (4).
 #'  This example data is not representative of real patient data due to
@@ -49,7 +80,8 @@
 #' excepted.
 #'
 #'
-#' @param sample_bed A dataframe for the a sample data
+#' @param bed_file: The bed file to get the coverage from
+#'  A dataframe for the a sample data
 #' (unknown if cancerous or not individual)
 #'  with at least 3 columns: first column is a string representing the chromosome
 #'  number for the cfDNA for instance: "chr1",
@@ -65,9 +97,7 @@
 #' #TODO:
 #' add references to content above.
 #'
-#' @return Return an dataframe of nucleosome coverage:
-#' value refer to the number of cfDNA fragments that cover the region of the
-#' nucleosome.
+#' @return A list of coverage values
 #'
 #' @references
 #' 1- Katsman, E., Orlanski, S., Martignano, F., Fox-Fisher, I., Shemer,
@@ -102,44 +132,49 @@
 #'
 #' # Example 1:
 #'
-#' cov <- nucleosomeCoverage(sample_bed = sample_bed)
+#' ## Note: example does not work because the chromosome1 length is shoerter
+#' than the chromosome length in sample bed file
+#'
+#' cov <- get_coverage(bed_file = sample_bed)
 #' cov
+#' # check for instance
+#' cov[2985822, 1]
 #'
 #' }
 #'
 #'
-#' @export
+#'
+get_coverage <- function(bed_file){
 
-
-nucleosomeCoverage <- function(sample_bed){
+  # create a dictionary with format: {chr1: 0...00, chr2: 0..00}
+  coverage <- list()
+  for (i in 1:22) {
+    chrom <- paste0("chr", i)
+    coverage[[chrom]] <- numeric(249*10**6)
+  }
 
   #check if the input values are correct.
-  if (! is.data.frame(sample_bed)) {
+  if (! is.data.frame(bed_file)) {
     stop("Please put valid inputs for nucleosomeCoverage function")
   }
 
-  # the maximum length of cfDNA in this file
-  chromosome_length = as.numeric(max(sample_bed[, 3]) - min(sample_bed[, 2]))
-  # coverage array
-  coverage = c(1:chromosome_length) * 0
 
-  #row in bed file (1 cfDNA)
-  for (i in c(1:nrow(sample_bed))){
-      #traverse the length of the cfDNA fragment
-      for (j in c(sample_bed[i, 2]:sample_bed[i, 3])){
-        coverage[j] =  coverage[j] + 1
-
-      }
+  #go along the indexes of the start_cov array
+  for (row in 1:nrow(bed_file)){
+    chr = bed_file[row, 1]
+    start = bed_file[row, 2]
+    end = bed_file[row, 3]
+    for (i in range(start, end + 1)){
+      coverage[[chr]][i] =  coverage[[chr]][i] + 1
     }
 
+  }
 
-
-
-  # check for instance coverage[2985822]
-  return(as.data.frame(coverage))
+  return(coverage)
 
 
 }
+
 
 
 

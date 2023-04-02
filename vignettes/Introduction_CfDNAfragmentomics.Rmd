@@ -93,15 +93,7 @@ use in research as a package which scientists can run their samples to detect ca
 Fragmentation sizes of cfDNA molecules are potential cancer biomarkers (4).
 Hence, to find if a patient data file contains cancer information,
 it can be compared with a control dataset with known healthy cfDNA fragments.
-The t-test is a parametric test used to determine
-significance of the difference in fragment
-size of the control and patient cfDNA lengths to determine if the patient
-data contains the cancer biomarker.
-Here, we are comparing two independent samples, which are the
-control and patient data, and we are making inference about the state
-(cancer positive or negative) of the
-population of cfDNA molecules in the patient as being potentially cancer
-positive or negative. This function takes as input cfDNA read dataframes from patient and controls, which can be read from .bed or .txt files. This function also takes as input, p-values for the t-test analysis of mononucleosomes and dinucleosomes.The function returns a list of outputs. 
+The Wilcoxon rank sum test, also known as the Mann-Whitney U test, is a non-parametric test used to determine  significance of the difference in fragment size of the control and patient cfDNA lengths to determine if the patient data contains the cancer biomarker. Here, we are comparing two independent samples, which are the population of healthy control cfDNA data and population of patient cfDNA data, and we are making inference about the state of being cancer positive or negative of the population of cfDNA molecules in the patient as being potentially cancer positive or negative. Both control and patient data inputted to the functions are assumed to be reads for the specific loci corresponding to the cancer type of interest. Hence, both the control  and patient data are required in the analysis to ensure the loci being analysed are corresponding to the specific cancer type of interest. This function takes as input cfDNA read dataframes from patient and controls, which can be read from .bed or .txt files. This function also takes as input, p-values for the U-test analysis of mononucleosomes and dinucleosomes.The function returns a list of outputs. 
 This list contains a real number: ttest_mono_pvalue, a real number: ttest_di_pvalue, 
 and a boolean value: cancerous.
 ttest_mono_pvalue is the p-value calculated for the difference in mononucleosome
@@ -134,14 +126,7 @@ c. The length of the fragments to analyse is within the range of 100-400 base pa
 avoid using a large memory space and to ensure only short cfDNA fragments are 
 analysed\
 
-d. The t-test is a parametric test used to determine
-significance of the difference in fragment
-size of the control and patient cfDNA lengths to determine if the patient
-data contains the cancer biomarker.
-performing a parametric t-test assumes that the data is normally distributed (15).
-However, this may not always be assumed for real, patient data. 
-Yet, in this analysis, this test will be performed, 
-with the assumption that the data is normally distributed.\
+d. The Wilcoxon rank sum test, also known as the Mann-Whitney U test, is a non-parametric test used to determine  significance of the difference in fragment size of the control and patient cfDNA lengths to determine if the patient data contains the cancer biomarker. Here, we are comparing two independent samples, which are the population of healthy control cfDNA data and population of patient cfDNA data, and we are making inference about the state of being cancer positive or negative of the population of cfDNA molecules in the patient as being potentially cancer positive or negative. Both control and patient data inputted to the functions are assumed to be reads for the specific loci corresponding to the cancer type of interest. Hence, both the control  and patient data are required in the analysis to ensure the loci being analysed are corresponding to the specific cancer type of interest.
 
 e. It is also assumed that the data is real human data and contains
 both mono-nucleosome and di-nucleosome length data, sequenced from Illumina and
@@ -164,7 +149,7 @@ library(CfDNAfragmentomics)
 ?CfDNAfragmentomics::nucleosomeRatio
 ``` 
 
-Here the function *nucleosomeRatio* is a function that calculates the t-test of the lengths in patient and control data to determine their significance of difference. Also, this function determines if the lengths in the patient data are significantly shorter than the control data to determine if the patient has the cancer biomarker. To calculate the t-test, the function should be provided with controls_bed which is the dataframe generated from the .bed or .txt files for control data, and sample_bed which is the dataframe generated from the .bed or .txt fil of patient cfDNA data, di_nucleosome_p_value which is the p-value for the dinuclesome ratio and mono_nucleosome_p_value the p-value for the mononuclesome ratio such that the data is considered significant. The result of the t-test that is considered significant for di-nucleosome and mon-nucleosome ratios
+Here the function *nucleosomeRatio* is a function that calculates the U-test of the lengths in patient and control data to determine their significance of difference. Also, this function determines if the lengths in the patient data are significantly shorter than the control data to determine if the patient has the cancer biomarker. To calculate the U-test, the function should be provided with controls_bed which is the dataframe generated from the .bed or .txt files for control data, and sample_bed which is the dataframe generated from the .bed or .txt fil of patient cfDNA data, di_nucleosome_p_value which is the p-value for the dinuclesome ratio and mono_nucleosome_p_value the p-value for the mononuclesome ratio such that the data is considered significant. The result of the U-test that is considered significant for di-nucleosome and mon-nucleosome ratios
 can be different, so based on the user's data, these values can be inputted. 
 
 
@@ -198,7 +183,7 @@ Here, nucleosomeRatio is an list object with a logical field called cancerous wh
 ratio$cancerous
 ``` 
 Also, the nucleosomeRatio return list object has fields called ttest_mono_pvalue and ttest_di_pvalue which are
-the p-values from the t-test analysis for the cfDNA fragment lengths compared between the patient and control
+the p-values from the U-test analysis for the cfDNA fragment lengths compared between the patient and control
 data. The significance of these values are evaluated based on the p-values that the user had inputted that are considered significant, or 0.05 by default.  
 
 ```{r, }
